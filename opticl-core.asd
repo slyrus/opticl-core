@@ -6,6 +6,7 @@
   :licence "BSD"
   :serial t
   :default-component-class cl-source-file
+  :depends-on (alexandria)
   :components
   ((:file "package")
    (:file "opticl-core")))
