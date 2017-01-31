@@ -20,6 +20,36 @@
 (deftype rgba-image (&key element-type)
   `(simple-array ,element-type (* * 4)))
 
+(defmacro define-image-type (name &key channels element-type)
+  "Defines a new image type. Under the covers, this results in
+evaluation of the appropriate deftype and make-my-image-type
+constructor functions. Returns the name of the created
+type (i.e. name)."
+  (let ((type (read-from-string (format nil "~A" name))))
+    (let ((ctor-function
+           (read-from-string (format nil "make-~A" type))))
+      `(progn
+         (deftype ,type () ',(list* 'image
+                                    (append
+                                     (when channels
+                                       `(:channels ,channels))
+                                     (when element-type
+                                       `(:element-type ,element-type)))))
+         (defun ,ctor-function
+             (height width &key (initial-element nil initial-element-p)
+                                (initial-contents nil initial-contents-p))
+           (apply #'make-array (append (list height width)
+                                       (when ,(and channels
+                                                   (> channels 1))
+                                         (list ,channels)))
+                  :element-type ',element-type
+                  (append
+                   (when initial-element-p
+                     `(:initial-element ,initial-element))
+                   (when initial-contents-p
+                     `(:initial-contents ,initial-contents)))))
+         ',type))))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *image-types*
     '((single-float-image :element-type single-float)
@@ -52,42 +82,24 @@
       (double-float-rgba-image :channels 4 :element-type double-float)
       )))
 
+;;
+;; to define a new image type one could do:
+;;
+;; (define-image-type rational-gray-image :channels 1 :element-type rational)
+;;
+
 (macrolet
-    ((frob-image (name &key channels element-type)
-       (let ((type (read-from-string (format nil "~A" name))))
-         (let ((ctor-function
-                 (read-from-string (format nil "make-~A" type))))
-           `(progn
-              (deftype ,type () ',(list* 'image
-                                         (append 
-                                          (when channels
-                                            `(:channels ,channels))
-                                          (when element-type
-                                            `(:element-type ,element-type)))))
-              (defun ,ctor-function
-                  (height width &key (initial-element nil initial-element-p)
-                                     (initial-contents nil initial-contents-p))
-                (apply #'make-array (append (list height width)
-                                            (when ,(and channels
-                                                        (> channels 1))
-                                              (list ,channels)))
-                       :element-type ',element-type
-                       (append
-                        (when initial-element-p
-                          `(:initial-element ,initial-element))
-                        (when initial-contents-p
-                          `(:initial-contents ,initial-contents)))))))))
-     (frobber ()
+    ((frobber ()
        `(progn
           ,@(loop for image-spec in *image-types*
-                  collect 
-                  (destructuring-bind (name &key channels element-type)
-                      image-spec
-                    `(frob-image ,name
-                                 ,@(if channels
-                                       `(:channels ,channels))
-                                 ,@(if element-type
-                                       `(:element-type ,element-type))))))))
+               collect
+                 (destructuring-bind (name &key channels element-type)
+                     image-spec
+                   `(define-image-type ,name
+                        ,@(if channels
+                              `(:channels ,channels))
+                      ,@(if element-type
+                            `(:element-type ,element-type))))))))
   (frobber))
 
 ;;; support functions/constants for the pixel setf-expander need to
