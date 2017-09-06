@@ -14,6 +14,9 @@
 (deftype gray-image (&key element-type)
   `(simple-array ,element-type (* *)))
 
+(deftype gray-alpha-image (&key element-type)
+  `(simple-array ,element-type (* * 2)))
+
 (deftype rgb-image (&key element-type)
   `(simple-array ,element-type (* * 3)))
 
@@ -64,6 +67,13 @@ type (i.e. name)."
       (fixnum-gray-image :channels 1 :element-type fixnum)
       (single-float-gray-image :channels 1 :element-type single-float)
       (double-float-gray-image :channels 1 :element-type double-float)
+
+      (1-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 1))
+      (2-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 2))
+      (4-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 4))
+      (8-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 8))
+      (16-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 16))
+      (32-bit-gray-alpha-image :channels 2 :element-type (unsigned-byte 32))
 
       (4-bit-rgb-image :channels 3 :element-type (unsigned-byte 4))
       (8-bit-rgb-image :channels 3 :element-type (unsigned-byte 8))
