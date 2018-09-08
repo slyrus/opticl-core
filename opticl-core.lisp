@@ -23,7 +23,7 @@
 (deftype rgba-image (&key element-type)
   `(simple-array ,element-type (* * 4)))
 
-(defmacro define-image-type (name &key channels element-type)
+(defmacro define-image-type (name &key channels element-type initial-element)
   "Defines a new image type. Under the covers, this results in
 evaluation of the appropriate deftype and make-my-image-type
 constructor functions. Returns the name of the created
@@ -39,7 +39,7 @@ type (i.e. name)."
                                      (when element-type
                                        `(:element-type ,element-type)))))
          (defun ,ctor-function
-             (height width &key (initial-element nil initial-element-p)
+             (height width &key (initial-element ,initial-element initial-element-p)
                                 (initial-contents nil initial-contents-p))
            (apply #'make-array (append (list height width)
                                        (when ,(and channels
@@ -47,7 +47,7 @@ type (i.e. name)."
                                          (list ,channels)))
                   :element-type ',element-type
                   (append
-                   (when initial-element-p
+                   (when (or initial-element initial-element-p)
                      `(:initial-element ,initial-element))
                    (when initial-contents-p
                      `(:initial-contents ,initial-contents)))))
