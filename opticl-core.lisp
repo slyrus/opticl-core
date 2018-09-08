@@ -53,11 +53,6 @@ type (i.e. name)."
                      `(:initial-contents ,initial-contents)))))
          ',type))))
 
-(defstruct hsv-pixel
-  (hue 0 :type float)
-  (saturation 0 :type float)
-  (value 0 :type float))
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *image-types*
     '((number-image :element-type number)
@@ -95,9 +90,7 @@ type (i.e. name)."
       (32-bit-rgba-image :channels 4 :element-type (unsigned-byte 32))
       (fixnum-rgba-image :channels 4 :element-type fixnum)
       (single-float-rgba-image :channels 4 :element-type single-float)
-      (double-float-rgba-image :channels 4 :element-type double-float)
-
-      (hsv-image :channels 1 :element-type hsv-pixel))))
+      (double-float-rgba-image :channels 4 :element-type double-float))))
 
 ;;
 ;; to define a new image type one could do:
@@ -110,7 +103,7 @@ type (i.e. name)."
        `(progn
           ,@(loop for image-spec in *image-types*
                collect
-                 (destructuring-bind (name &key channels element-type)
+                 (destructuring-bind (name &key channels element-type initial-element)
                      image-spec
                    `(define-image-type ,name
                      ,@(if channels
@@ -120,6 +113,35 @@ type (i.e. name)."
                      ,@(if initial-element
                            `(:initial-element ,initial-element))))))))
   (frobber))
+
+;;
+
+;; Add some new (experimental) image types with structs as "pixels"
+;; instead of just numbers in an array.
+
+;; First let's try a simple 8-bit RGB pixel
+(defstruct 8-bit-rgb-pixel
+  (red 0 :type (unsigned-byte 8))
+  (green 0 :type (unsigned-byte 8))
+  (blue 0 :type (unsigned-byte 8)))
+
+(define-image-type 8-bit-rgb-pixel-image
+    :channels 1
+    :element-type 8-bit-rgb-pixel
+    :initial-element (make-8-bit-rgb-pixel))
+
+;;
+;; Now let's make an HSV pixel (could also do YUV, etc...)
+(defstruct hsv-pixel
+  (hue 0.0 :type float)
+  (saturation 0.0 :type float)
+  (value 0.0 :type float))
+
+(define-image-type hsv-image
+    :channels 1
+    :element-type hsv-pixel
+    :initial-element (make-hsv-pixel))
+
 
 ;;; support functions/constants for the pixel setf-expander need to
 ;;; exist at compile time
