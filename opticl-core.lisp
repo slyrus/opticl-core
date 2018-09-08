@@ -11,10 +11,10 @@
                           `(* * ,channels))
                       channels)))
 
-(deftype gray-image (&key (element-type 'number))
+(deftype gray-image (&key element-type)
   `(simple-array ,element-type (* *)))
 
-(deftype gray-alpha-image (&key  (element-type 'number))
+(deftype gray-alpha-image (&key element-type)
   `(simple-array ,element-type (* * 2)))
 
 (deftype rgb-image (&key element-type)
