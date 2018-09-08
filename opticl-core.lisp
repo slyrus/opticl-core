@@ -113,10 +113,12 @@ type (i.e. name)."
                  (destructuring-bind (name &key channels element-type)
                      image-spec
                    `(define-image-type ,name
-                        ,@(if channels
-                              `(:channels ,channels))
-                      ,@(if element-type
-                            `(:element-type ,element-type))))))))
+                     ,@(if channels
+                           `(:channels ,channels))
+                     ,@(if element-type
+                           `(:element-type ,element-type))
+                     ,@(if initial-element
+                           `(:initial-element ,initial-element))))))))
   (frobber))
 
 ;;; support functions/constants for the pixel setf-expander need to
