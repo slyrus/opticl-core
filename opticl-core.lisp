@@ -11,10 +11,10 @@
                           `(* * ,channels))
                       channels)))
 
-(deftype gray-image (&key element-type)
+(deftype gray-image (&key (element-type 'number))
   `(simple-array ,element-type (* *)))
 
-(deftype gray-alpha-image (&key element-type)
+(deftype gray-alpha-image (&key  (element-type 'number))
   `(simple-array ,element-type (* * 2)))
 
 (deftype rgb-image (&key element-type)
@@ -53,9 +53,15 @@ type (i.e. name)."
                      `(:initial-contents ,initial-contents)))))
          ',type))))
 
+(defstruct hsv-pixel
+  (hue 0 :type float)
+  (saturation 0 :type float)
+  (value 0 :type float))
+
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defparameter *image-types*
-    '((single-float-image :element-type single-float)
+    '((number-image :element-type number)
+      (single-float-image :element-type single-float)
       (double-float-image :element-type double-float)
       
       (1-bit-gray-image :channels 1 :element-type (unsigned-byte 1))
@@ -90,7 +96,8 @@ type (i.e. name)."
       (fixnum-rgba-image :channels 4 :element-type fixnum)
       (single-float-rgba-image :channels 4 :element-type single-float)
       (double-float-rgba-image :channels 4 :element-type double-float)
-      )))
+
+      (hsv-image :channels 1 :element-type hsv-pixel))))
 
 ;;
 ;; to define a new image type one could do:
