@@ -48,6 +48,14 @@
            #:single-float-rgba-image #:make-single-float-rgba-image
            #:double-float-rgba-image #:make-double-float-rgba-image
 
+           #:hsv-image
+           #:make-hsv-image
+           #:hsv-pixel
+           #:make-hsv-pixel
+           #:hsv-pixel-hue
+           #:hsv-pixel-saturation
+           #:hsv-pixel-value
+
            #:with-image-bounds
 
            #:do-pixels
